@@ -10,10 +10,17 @@ def test_01():
 
     dataset = pd.read_csv(f"{FOLDER}/data/auto_mpg.csv")
     dataset = dataset.dropna()
-    dataset["Origin"] = dataset["Origin"].map(
-        {1: "USA", 2: "Europe", 3: "Japan"},
+
+    # Si tu dataset tiene la columna 'Car Name', elimínala
+    if "Car Name" in dataset.columns:
+        dataset = dataset.drop(columns=["Car Name"])
+
+    # NO uses .map() para reemplazar 1, 2, 3 por nombres de texto.
+    # Aplica get_dummies directamente sobre la columna numérica 'Origin':
+    dataset = pd.get_dummies(
+        dataset, columns=["Origin"], prefix="", prefix_sep="", dtype=int
     )
-    dataset = pd.get_dummies(dataset, columns=["Origin"], prefix="", prefix_sep="")
+
     y_true = dataset.pop("MPG")
 
     with open(f"{FOLDER}/submission/mlp.pkl", "rb") as file:
